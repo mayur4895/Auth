@@ -9,10 +9,12 @@ import LoginSchema from "@/schemas/LoginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { error } from "console";
 import { AuthError } from "next-auth";
+import { useSearchParams } from "next/navigation";
 import z from "zod"
 export const  login = async (values :z.infer <typeof LoginSchema>)=>{
-  const validatedFields =  LoginSchema.safeParse(values);
-  if(!validatedFields.success){
+ 
+    const validatedFields =  LoginSchema.safeParse(values);
+if(!validatedFields.success){
 
        return   {error: "Invlaid Fields"}
             };
@@ -28,12 +30,12 @@ await signIn("credentials",{
       } catch (error) {
           if (error instanceof AuthError) {
                switch (error.type) {
-                         case "CredentialsSignin":
-                             return { msg: "Invalid credentials" , status: "error"};
+                         case "OAuthAccountNotLinked": 
+                             return { error: "Invalid credentials" , status: "error"};
                          case "CredentialsSignin":
                              throw error;
                          default:
-                             return { msg: "Something went wrong", status: "error" };
+                             return { error: "Something went wrong", status: "error" };
                      }
              }
   

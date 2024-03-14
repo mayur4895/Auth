@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
  
  
 import axios from "axios";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
 import { Loader2 } from "lucide-react";
  
@@ -37,10 +37,20 @@ import { useToast } from "./ui/use-toast";
  
 import { login } from "@/actions/login";
 import LoginSchema from "@/schemas/LoginSchema";
+import { FcGoogle } from "react-icons/fc";
+import { AiFillGithub } from "react-icons/ai";
+import { Separator } from "./ui/separator";
+ 
+import { DEFAULT_LOGIN_REDIRECT } from "@/route";
+import { signIn } from "next-auth/react";
  
 
  
 const Login = () => {
+  const SearchParams = useSearchParams();
+  const urlError = SearchParams.get("error") === "OAuthAccountNotLinked";
+  console.log(urlError);
+  
   const {toast} = useToast();
   const router = useRouter();
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -56,41 +66,47 @@ const Login = () => {
      
     try {
       const res =  await  login(values);
-      form.reset();
-       router.refresh();  
-      toast({
-        variant:"success",
-        title:res?.success,
-        description: "you are now logdin",
-       })
-
-
+       if(urlError){
+        toast({
+          variant:"destructive",
+          title: "Email alerday in used", 
+        })
+       }
        if(res?.error){
          
-      toast({
-        variant:"destructive",
-        title:res?.error,
-        description: "Invalid User",
-       })
+        toast({
+          variant:"destructive",
+          title:res?.error, 
+         })
+  
+         }
+      
+        router.push("/posts")
 
-       }
+        form.reset();
+        router.refresh();  
   
     } catch (error) {
       console.log(error);
       toast({
         variant:"destructive",
-        title: "Invalid User",
-        description: "Unauthorized User",
+        title: "Invalid User", 
        })
        form.reset();
 
     }
   }
 
+const onclick = async( provider:string)=>{
+   await signIn(provider,{
+     callbackUrl:DEFAULT_LOGIN_REDIRECT
+   });
+} 
+
   return (
     <>
       <div className=" flex h-[100vh] w-full justify-center items-center">
-        <Card className="p-5 max-w-lg w-full">
+        <Card className="px-8 py-5 max-w-md w-full">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-3xl">Login</CardTitle>
             <CardDescription>Login to your account</CardDescription>
@@ -104,7 +120,7 @@ const Login = () => {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter Email" {...field} />
+                      <Input placeholder="example@gmail.com" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -118,7 +134,7 @@ const Login = () => {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter Password"
+                        placeholder="*********"
                         {...field}
                       />
                     </FormControl>
@@ -126,14 +142,27 @@ const Login = () => {
                 )}
               />
 
-              <CardFooter className=" justify-between p-0">
-                <Button type="submit">
+              <CardFooter className=" justify-between gap-3 flex-col w-full p-0">
+                
+              <Button type="submit" className=" h-10 w-full">
                   {isloding ? <Loader2 className=" animate-spin" /> : "Login"}
                 </Button>
-                <span className="text-sm text-zinc-500">
+                <span className="flex  whitespace-nowrap items-center justify-center text-sm gap-5 text-zinc-500"> <Separator/> Or Sign in with  <Separator/>  </span>
+              <div className="flex  justify-center gap-3 w-full">
+                <Button onClick={()=>{onclick('google')}} variant={"outline"} className="flex items-center gap-2 w-full text-gray-500 h-12">
+                  <FcGoogle size={25}/>Google
+                </Button>
+
+                <Button onClick={()=>{onclick('github')}} variant={"outline"} className="flex items-center gap-2 w-full text-gray-500 h-12">
+                  <AiFillGithub size={25}/>Github
+                </Button>
+ 
+              
+              </div>
+              <span className="text-sm text-zinc-500">
                   {" "}
-                  You have not an accont?
-                  <Link href="/auth/signup" className="text-blue-500">
+                   Don't have an account?
+                  <Link href="/auth/signup" className=" font-semibold text-zinc-900">
                     {" "}
                     signup
                   </Link>

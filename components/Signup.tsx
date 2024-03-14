@@ -65,8 +65,8 @@ const Signup = () => {
       if(res?.success){
         toast({
           variant:"success",
-          title: "Signup Success",
-          description: "you are now signed up",
+          title: res?.success,
+       
         })   
          router.push("/auth/login");
       }
@@ -75,8 +75,7 @@ const Signup = () => {
       if(res?.error){
         toast({
           variant:"destructive",
-          title:res.error,
-          description: "Email Alerady in use",
+          title:res.error,  
         })   
          
       }
@@ -96,7 +95,7 @@ const Signup = () => {
   return (
     <>
       <div className=" flex h-[100vh] w-full justify-center items-center">
-        <Card className="p-5 max-w-lg w-full">
+      <Card className="px-8 py-5 max-w-md w-full">
           <CardHeader className="p-0 mb-4">
             <CardTitle className="text-3xl">Signup</CardTitle>
             <CardDescription>Sign up to get started</CardDescription>
@@ -153,14 +152,14 @@ const Signup = () => {
                 )}
               />
 
-              <CardFooter className=" justify-between p-0">
-                <Button type="submit">
+<CardFooter className=" justify-between gap-3 flex-col w-full p-0">
+                <Button type="submit" className="h-10 w-full">
                   {isloding ? <Loader2 className=" animate-spin" /> : "Signup"}
                 </Button>
                 <span className="text-sm text-zinc-500">
                   {" "}
                   You have already singup?
-                  <Link href="/auth/login" className="text-blue-500">
+                  <Link href="/auth/login" className="text-zinc-800 font-semibold">
                     {" "}
                     login
                   </Link>

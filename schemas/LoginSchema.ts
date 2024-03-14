@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-    const formSchema = z.object({
+    const LoginSchema = z.object({
     email: z
       .string()
       .email({
@@ -13,4 +13,4 @@ import { z } from "zod";
   });
 
 
-  export default formSchema;
+  export default LoginSchema;
